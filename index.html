@@ -1,0 +1,528 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ludo Board</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/konva@8.0.0/konva.min.js"></script>
+ 
+    <style>
+        body {
+    background-color: #501111; /* Background color */
+    color-scheme: light; /* Light color scheme */
+    margin: 0;
+           overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            height: 100vh;
+            align-items: center;
+            justify-content: space-between;
+}
+
+.grid-container {
+    display: grid;
+    gap: 2px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.grid-item {
+    border: 3px solid #bbb; /* Default border for small grid items */
+    aspect-ratio: 1; /* Square shape */
+}
+
+/* Ludo colors */
+.home-base-red {
+    background-color: red;
+    border: 6px solid white; /* Thick white border for red home base */
+}
+
+.home-base-yellow {
+    background-color: yellow;
+    border: 6px solid white; /* Thick white border for yellow home base */
+}
+
+.home-base-green {
+    background-color: green;
+    border: 6px solid white; /* Thick white border for green home base */
+}
+
+.home-base-blue {
+    background-color: blue;
+    border: 6px solid white; /* Thick white border for blue home base */
+}
+
+/* Central squares */
+.center-grid {
+    background-color: white;
+}
+
+/* 15x6 grid styles */
+.grid-container-15x6 {
+    grid-template-columns: repeat(15, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+}
+
+.large-grid-left-6x6 {
+    grid-column: 1 / span 6;
+    grid-row: 1 / span 6;
+}
+
+.large-grid-right-6x6 {
+    grid-column: 10 / span 6;
+    grid-row: 1 / span 6;
+}
+
+/* 15x3 grid styles */
+.grid-container-15x3 {
+    grid-template-columns: repeat(15, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    margin-top: 0px;
+}
+
+.large-grid-center-3x3 {
+    grid-column: 7 / span 3;
+    grid-row: 1 / span 3;
+}
+
+@media (max-width: 768px) {
+    .grid-container-15x6 {
+        grid-template-columns: repeat(15, 20px);
+        grid-template-rows: repeat(6, 20px);
+    }
+
+    .grid-container-15x3 {
+        grid-template-columns: repeat(15, 20px);
+        grid-template-rows: repeat(3, 20px);
+    }
+}
+
+@media (min-width: 768px) {
+    .grid-container-15x6 {
+        grid-template-columns: repeat(15, 50px);
+        grid-template-rows: repeat(6, 50px);
+    }
+
+    .grid-container-15x3 {
+        grid-template-columns: repeat(15, 50px);
+        grid-template-rows: repeat(3, 50px);
+    }
+}
+
+/* Modify the container to fit within mobile screens without scrolling */
+.container {
+    max-width: 90vw;
+    margin: 0 auto;
+    padding: 0;
+}
+
+        #message {
+            font-size: 18px;
+            colour: #ffffff;
+            margin-bottom: 10px;
+        }
+        #container {
+            width: 100%;
+            height: 20%; /* Adjust height for the dice */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            margin-bottom: 60px; /* Margin to ensure space for the footer */
+        }
+        footer {
+            width: 100%;
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+        }
+        
+        #playButton {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #f0ad4e;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            margin-bottom: 20px; /* Space between dice and button */
+        }
+</style>
+
+</head>
+<body>
+  <div id="message">Yellow's turn</div>
+  
+  
+  <br>
+    <div class="container">
+      
+      
+       <!-- First Grid: 15x6 with large grids on left and right -->
+        <div class="grid-container grid-container-15x6">
+            <!-- Large grid on the left side - Red Home Base -->
+            <div class="grid-item large-grid-left-6x6 home-base-red"
+     style="display: flex; align-items: center; justify-content: center; font-size: 24px; text-align: center;">
+    ⚪ ⚪<br>⚪ ⚪
+</div>
+
+            <!-- Remaining small grid items -->
+            <div class="grid-item center-grid b50 y24"></div>
+            <div class="grid-item b51 y25"  style="background-color: #ffffff;"></div>
+            
+            <div class="grid-item y26" style="background-color: #ffffff;"></div>
+            <div class="grid-item b49 y23" style="background-color: #ffffff;"></div>
+            <div class="grid-item b52" style="background-color: blue;"></div>
+            <div class="grid-item b1 y27" style="background-color: blue;">⭐</div>
+            <div class="grid-item b48 y22" style="border-color: blue; border-width: 2px; background-color: #ffffff;">⭐</div>
+            <div class="grid-item b53" style="background-color: blue;"></div>
+            <div class="grid-item center-grid b2 y28"></div>
+            <div class="grid-item b47 y21" style="background-color: #ffffff;"></div>
+            <div class="grid-item b54" style="background-color: blue;"></div>
+            <div class="grid-item b3 y29" style="background-color: #ffffff;"></div>
+            <div class="grid-item b46 y20" style="background-color: #ffffff;"></div>
+            <div class="grid-item b55" style="background-color: blue;"></div>
+            <div class="grid-item b4 y30" style="background-color: #ffffff;"></div>
+            <div class="grid-item b45 y19" style="background-color: #ffffff;"></div>
+            <div class="grid-item b56" style="background-color: blue;"></div>
+            <div class="grid-item b5 y31" style="background-color: #ffffff;"></div>
+
+            <!-- Large grid on the right side - Blue Home Base -->
+            <div class="grid-item large-grid-right-6x6 home-base-blue"
+     style="display: grid; grid-template-columns: repeat(2, auto); gap: 10px; align-items: center; justify-content: center; text-align: center;">
+    <div style="position: relative; display: inline-block; margin: 2px;">
+        <div style="font-size: 24px; position: relative; z-index: 1;">⚪</div>
+        <div style="font-size: 12px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2;">🔵</div>
+    </div>
+    <div style="position: relative; display: inline-block; margin: 2px;">
+        <div style="font-size: 24px; position: relative; z-index: 1;">⚪</div>
+        <div style="font-size: 12px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2;">🔵</div>
+    </div>
+    <div style="position: relative; display: inline-block; margin: 2px;">
+        <div style="font-size: 24px; position: relative; z-index: 1;">⚪</div>
+        <div style="font-size: 12px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2;">🔵</div>
+    </div>
+    <div style="position: relative; display: inline-block; margin: 2px;">
+        <div style="font-size: 24px; position: relative; z-index: 1;">⚪</div>
+        <div style="font-size: 12px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2;">🔵</div>
+    </div>
+</div>
+
+        </div>
+
+        <!-- Second Grid: 15x3 with large grid in the center -->
+        <div class="grid-container grid-container-15x3">
+            <!-- Small grid items on the left -->
+            <div class="grid-item b39 y13" style="background-color: #ffffff;"></div>
+            <div class="grid-item b40 y14"  style="background-color: red;">⭐</div>
+            <div class="grid-item b41 y15" style="background-color: #ffffff;"></div>
+            <div class="grid-item b42 y16" style="background-color: #ffffff;"></div>
+            <div class="grid-item b43 y17" style="background-color: #ffffff;"></div>
+            <div class="grid-item b44 y18" style="background-color: #ffffff;"></div>
+            
+            <div class="grid-item b6 y32" style="background-color: #ffffff;"></div>
+            <div class="grid-item b7 y33" style="background-color: #ffffff;"></div>
+            <div class="grid-item b8 y34" style="background-color: #ffffff;"></div>
+            <div class="grid-item b9 y35" style="border-color: green; border-width: 2px; background-color: #ffffff;">⭐</div>
+            <div class="grid-item b10 y36" style="background-color: #ffffff;"></div>
+            <div class="grid-item b11 y37" style="background-color: #ffffff;"></div>
+            
+            <div class="grid-item b38 y12" style="background-color: #ffffff;"></div>
+            <div class="grid-item" style="background-color: red;"></div>
+            <div class="grid-item" style="background-color: red;"></div>
+            <div class="grid-item" style="background-color: red;"></div>
+            <div class="grid-item" style="background-color: red;"></div>
+            <div class="grid-item" style="background-color: red;"></div>
+
+            <!-- Large grid in the center - Central Area -->
+           
+<div class="grid-item large-grid-center-3x3 center-grid" style='background-color: orange;'></div>
+
+<!-- Small grid items on the right -->
+<div class="grid-item" style="background-color: green;"></div>
+<div class="grid-item" style="background-color: green;"></div>
+<div class="grid-item" style="background-color: green;"></div>
+<div class="grid-item" style="background-color: green;"></div>
+<div class="grid-item" style="background-color: green;"></div>
+<div class="grid-item b12 y38" style="background-color: #ffffff;"></div>
+
+<div class="grid-item b37 y11" style="background-color: #ffffff;"></div>
+<div class="grid-item b36 y10" style="background-color: #ffffff;"></div>
+<div class="grid-item b35 y9" style="border-color: red; border-width: 2px; background-color: #ffffff;">⭐</div>
+<div class="grid-item b34 y8" style="background-color: #ffffff;"></div>
+<div class="grid-item b33 y7" style="background-color: #ffffff;"></div>
+<div class="grid-item b32 y6" style="background-color: #ffffff;"></div>
+
+<div class="grid-item b18 y44" style="background-color: #ffffff;"></div>
+<div class="grid-item b17 y43" style="background-color: #ffffff;"></div>
+<div class="grid-item b16 y42" style="background-color: #ffffff;"></div>
+<div class="grid-item b15 y41" style="background-color: #ffffff;"></div>
+<div class="grid-item b14 y40" style="background-color: green;">⭐</div>
+<div class="grid-item b13 y39" style="background-color: #ffffff;"></div>
+</div>
+      
+
+
+<!-- Third Grid: Repeat of 15x6 grid -->
+<div class="grid-container grid-container-15x6">
+    <!-- Large grid on the left side - Yellow Home Base -->
+<!-- Large grid on the left side - Yellow Home Base -->
+<div class="grid-item large-grid-left-6x6 home-base-yellow"
+     id="home-base-yellow"
+     style="display: grid; grid-template-columns: repeat(2, auto); gap: 10px; align-items: center; justify-content: center; text-align: center;">
+    <div class="yellow-piece" style="position: relative; display: inline-block; margin: 2px;">
+        <div style="font-size: 24px; position: relative; z-index: 1;">⚪</div>
+        <div style="font-size: 12px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2;">🟡</div>
+    </div>
+    <div class="yellow-piece" style="position: relative; display: inline-block; margin: 2px;">
+        <div style="font-size: 24px; position: relative; z-index: 1;">⚪</div>
+        <div style="font-size: 12px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2;">🟡</div>
+    </div>
+    <div class="yellow-piece" style="position: relative; display: inline-block; margin: 2px;">
+        <div style="font-size: 24px; position: relative; z-index: 1;">⚪</div>
+        <div style="font-size: 12px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2;">🟡</div>
+    </div>
+    <div class="yellow-piece" style="position: relative; display: inline-block; margin: 2px;">
+        <div style="font-size: 24px; position: relative; z-index: 1;">⚪</div>
+        <div style="font-size: 12px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2;">🟡</div>
+    </div>
+</div>
+
+
+
+
+
+
+    <!-- Remaining small grid items -->
+    <div class="grid-item center-grid b31 y5"></div>
+    <div class="grid-item y56" style="background-color: yellow;"></div>
+    <div class="grid-item b19 y45" style="background-color: #ffffff;"></div>
+    <div class="grid-item b30 y4" style="background-color: #ffffff;"></div>
+    <div class="grid-item y55" style="background-color: yellow;"></div>
+    <div class="grid-item b20 y46" style="background-color: #ffffff;"></div>
+    <div class="grid-item b29 y3" style="background-color: #ffffff;"></div>
+    <div class="grid-item y54" style="background-color: yellow;"></div>
+    <div class="grid-item center-grid b21 y47"></div>
+    <div class="grid-item b28 y2" style="background-color: #ffffff;"></div>
+    <div class="grid-item y53" style="background-color: yellow;"></div>
+    <div class="grid-item b22 y48" style="border-color: yellow; border-width: 2px; background-color: #ffffff;">⭐</div>
+    <div class="grid-item b27 y1" style="background-color: yellow;">⭐</div>
+    <div class="grid-item y52" style="background-color: yellow;"></div>
+    <div class="grid-item b23 y49" style="background-color: #ffffff;"></div>
+    <div class="grid-item b26" style="background-color: #ffffff;"></div>
+    <div class="grid-item b25 y51" style="background-color: #ffffff;"></div>
+    <div class="grid-item b24 y50" style="background-color: #ffffff;"></div>
+
+    <!-- Large grid on the right side - Green Home Base -->
+    <div class="grid-item large-grid-right-6x6 home-base-green"
+     style="display: flex; align-items: center; justify-content: center; font-size: 24px; text-align: center;">
+    ⚪ ⚪<br>⚪ ⚪
+</div>
+</div>
+</div>
+
+    <div id="container"></div>
+    <footer>
+        <button id="playButton">Play</button>
+    </footer>
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+
+<script>
+        // Initialize the stage
+        var stage = new Konva.Stage({
+            container: 'container',
+            width: window.innerWidth,
+            height: window.innerHeight * 0.2 // Adjusted height for the dice
+        });
+
+        // Initialize the layer
+        var layer = new Konva.Layer();
+        stage.add(layer);
+
+        // Create a white square with rounded corners
+        var square = new Konva.Rect({
+            x: stage.width() / 2 - 30,
+            y: stage.height() / 2 - 30,
+            width: 60,  // Increased size by 20%
+            height: 60, // Increased size by 20%
+            fill: 'white',
+            stroke: 'black',
+            strokeWidth: 4,
+            cornerRadius: 10, // Rounded corners
+            offsetX: 30,
+            offsetY: 30
+        });
+
+        // Add the square to the layer
+        layer.add(square);
+
+        // Create a text object for the dice face with bold dots
+        var diceText = new Konva.Text({
+            x: stage.width() / 2 - 30,
+            y: stage.height() / 2 - 30,
+            text: '',
+            fontSize: 22,  // Increased font size for bold effect
+            fontFamily: 'Arial',
+            fontStyle: 'bold', // Bolder dots
+            fill: 'black',
+            width: 60,
+            align: 'center',
+            verticalAlign: 'middle',
+            offsetX: 30,
+            offsetY: 30
+        });
+
+        // Add text object to the layer
+        layer.add(diceText);
+        layer.draw();
+
+        // Function to get a random dice number
+        function getRandomDiceNumber() {
+            return Math.floor(Math.random() * 6) + 1;
+        }
+
+        // Function to get dice face text based on the number
+        function getDiceFaceText(number) {
+            const diceFaces = {
+                1: '   \n • \n   ',
+                2: '•  \n   \n  •',
+                3: '•  \n • \n  •',
+                4: '• •\n   \n• •',
+                5: '• •\n • \n• •',
+                6: '• •\n• •\n• •'
+            };
+            return diceFaces[number] || '';
+        }
+
+        var currentPlayer = 'yellow';
+        var consecutiveSixes = 0;
+        var rollingAllowed = true;
+
+        function updateMessage() {
+            document.getElementById('message').innerText = `${currentPlayer.charAt(0).toUpperCase() + currentPlayer.slice(1)}'s turn`;
+        }
+function rollDice() {
+    if (!rollingAllowed) return;
+
+    var button = document.getElementById('playButton');
+    button.disabled = true; // Disable the button
+
+    // Random dice number and rotation speed
+    var diceNumber = getRandomDiceNumber();
+    var diceFaceText = getDiceFaceText(diceNumber);
+    diceText.text(diceFaceText);
+
+    var rpm = Math.random() * (5 - 2) + 2;
+    var rotationSpeed = (rpm * 360) / 2; // Degrees per second
+
+    // Animation duration in seconds
+    var duration = 2;
+    var framesPerSecond = 60;
+    var totalFrames = duration * framesPerSecond;
+
+    var animation = new Konva.Animation(function(frame) {
+        var elapsedTime = frame.timeDiff / 1000; // Time elapsed in seconds
+        var rotation = rotationSpeed * elapsedTime; // Calculate rotation
+        square.rotate(rotation);
+        diceText.rotate(rotation); // Rotate the text along with the square
+        layer.batchDraw();
+    }, layer);
+
+    // Start animation
+    animation.start();
+
+    // Stop animation after 2 seconds
+    setTimeout(function() {
+        animation.stop();
+        button.disabled = false; // Enable the button
+
+        if (diceNumber === 6) {
+            consecutiveSixes++;
+            if (consecutiveSixes === 3) {
+                consecutiveSixes = 0; // Reset consecutive sixes
+                currentPlayer = currentPlayer === 'yellow' ? 'blue' : 'yellow'; // Switch player
+                updateMessage();
+            }
+            rollingAllowed = true; // Allow another roll
+        } else {
+            consecutiveSixes = 0; // Reset consecutive sixes
+            currentPlayer = currentPlayer === 'yellow' ? 'blue' : 'yellow'; // Switch player
+            updateMessage();
+            rollingAllowed = true; // Allow another roll
+        }
+        
+        // Call the function to move the piece from home base
+        movePieceFromHomeBase(diceNumber);
+    }, duration * 1000);
+}
+
+        
+        
+        function movePieceFromHomeBase(diceNumber) {
+    if (currentPlayer !== 'yellow') return; // Only process if it's yellow's turn
+    if (diceNumber !== 6) return; // Only process if diceNumber is 6
+
+    // Select the yellow pieces (🟡) directly
+    var yellowPieces = document.querySelectorAll('#home-base-yellow .yellow-piece > div:nth-child(2)');
+
+    // Define the function to move the clicked piece
+    function movePiece(pieceToMove) {
+        var targetGrid = document.querySelector('.y1');
+
+        if (targetGrid) {
+            // Remove the yellow piece (🟡) from its current container
+            var parentContainer = pieceToMove.parentElement;
+            parentContainer.removeChild(pieceToMove); // Remove the yellow piece (🟡) only
+
+            // Append the yellow piece (🟡) to the target grid
+            targetGrid.appendChild(pieceToMove);
+            pieceToMove.style.position = 'relative'; // Ensure correct positioning
+            pieceToMove.style.margin = '0'; // Remove any margin if needed
+
+            // Remove the event listeners after moving one piece
+            yellowPieces.forEach(function(piece) {
+                piece.parentElement.removeEventListener('click', onClickMovePiece);
+            });
+        }
+    }
+
+    // Function to handle the click event
+    function onClickMovePiece() {
+        movePiece(this.querySelector('div:nth-child(2)'));
+    }
+
+    // If there are four pieces, move the first one automatically
+    if (yellowPieces.length === 4) {
+        movePiece(yellowPieces[0]);
+    } else {
+        // If there are fewer than four pieces, attach click event to move the clicked piece
+        yellowPieces.forEach(function(piece) {
+            piece.parentElement.addEventListener('click', onClickMovePiece);
+        });
+    }
+}
+
+
+        // Button click event listener
+        document.getElementById('playButton').addEventListener('click', rollDice);
+
+        updateMessage(); // Initial message
+    </script>
+</body>
+</html>
+
+
