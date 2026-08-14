@@ -1,0 +1,276 @@
+body {
+    background-color: #501111; /* Background color */
+    color-scheme: light; /* Light color scheme */
+    margin: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 100vh;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.grid-container {
+    display: grid;
+    gap: 2px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.grid-item {
+    border: 2px solid #cfcfcf;
+    border-radius: 4px;
+    aspect-ratio: 1; /* Square shape */
+    box-sizing: border-box;
+    position: relative; /* anchor for pawns that land on this cell */
+    overflow: hidden; /* keep a landed pawn from bleeding into neighbor cells */
+}
+
+.star-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.star-canvas {
+    display: block;
+    width: 65%;
+    height: 65%;
+}
+
+/* Ludo colors */
+.home-base-red {
+    background-color: red;
+    border: 6px solid white; /* Thick white border for red home base */
+    border-radius: 14px;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.15);
+}
+
+.home-base-yellow {
+    background-color: yellow;
+    border: 6px solid white; /* Thick white border for yellow home base */
+    border-radius: 14px;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.15);
+}
+
+.home-base-green {
+    background-color: green;
+    border: 6px solid white; /* Thick white border for green home base */
+    border-radius: 14px;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.15);
+}
+
+.home-base-blue {
+    background-color: blue;
+    border: 6px solid white; /* Thick white border for blue home base */
+    border-radius: 14px;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.15);
+}
+
+/* Central squares */
+.center-grid {
+    background-color: white;
+}
+
+.large-grid-center-3x3 {
+    border-radius: 8px;
+}
+
+/* Home base structure
+   --------------------------------------------------------------
+   .home-base-inner  — a white rounded panel positioned with
+                        percentages so it always sits centered
+                        and sized relative to its own home base
+                        cell, at any breakpoint.
+   .home-slot         — one of the 4 fixed circular sockets inside
+                        that panel. This is part of the BOARD: it
+                        never moves and never disappears, even
+                        after its pawn has left for the track.
+   .piece-slot         — the actual pawn (🔴🔵🟢🟡). While it lives
+                        inside a .home-slot it just renders as
+                        plain centered text; once game logic moves
+                        it out onto a track cell, the default
+                        .piece-slot rule below (a floating white
+                        "sphere", CSS-drawn, no ⚪ emoji) takes over
+                        automatically because the CSS is scoped by
+                        the pawn's *current* parent, not by JS. */
+.home-base-inner {
+    position: absolute;
+    top: 12%;
+    left: 12%;
+    width: 76%;
+    height: 76%;
+    box-sizing: border-box;
+    background-color: #ffffff;
+    border-radius: 14%;
+    box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.08);
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 10%;
+    padding: 10%;
+}
+
+.home-slot {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #ffffff 0%, #eeeeee 60%, #cfcfcf 100%);
+    box-shadow: inset -2px -2px 3px rgba(0, 0, 0, 0.25), 0 1px 3px rgba(0, 0, 0, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Default pawn appearance: a small white "sphere" (CSS-drawn, no ⚪
+   emoji) centered on top of whatever cell it's placed in, sized
+   relative to that cell so it never overflows onto neighbors or
+   covers a cell's star marker. This is what a pawn looks like once
+   it's out on the track (e.g. inside .y1). */
+.piece-slot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 62%;
+    height: 62%;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #ffffff 0%, #eeeeee 60%, #bdbdbd 100%);
+    box-shadow: inset -2px -2px 3px rgba(0, 0, 0, 0.25), 0 1px 3px rgba(0, 0, 0, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    font-size: 10px; /* small default; scaled up on wider screens below */
+    z-index: 3; /* sit above a cell's star marker instead of overflowing it */
+}
+
+/* While a pawn sits inside a home slot, the slot itself already draws
+   the white sphere, so the pawn is just plain centered text — and,
+   importantly, the transform above is cancelled here so it can't
+   nudge the pawn off-center within its slot. */
+.home-slot .piece-slot {
+    position: static;
+    top: auto;
+    left: auto;
+    transform: none;
+    width: auto;
+    height: auto;
+    background: none;
+    box-shadow: none;
+    font-size: 18px;
+    z-index: auto;
+}
+
+.piece-slot.movable {
+    cursor: pointer;
+}
+
+/* 15x6 grid styles */
+.grid-container-15x6 {
+    grid-template-columns: repeat(15, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+}
+
+.large-grid-left-6x6 {
+    grid-column: 1 / span 6;
+    grid-row: 1 / span 6;
+}
+
+.large-grid-right-6x6 {
+    grid-column: 10 / span 6;
+    grid-row: 1 / span 6;
+}
+
+/* 15x3 grid styles */
+.grid-container-15x3 {
+    grid-template-columns: repeat(15, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    margin-top: 0px;
+}
+
+.large-grid-center-3x3 {
+    grid-column: 7 / span 3;
+    grid-row: 1 / span 3;
+}
+
+@media (max-width: 768px) {
+    .grid-container-15x6 {
+        grid-template-columns: repeat(15, 20px);
+        grid-template-rows: repeat(6, 20px);
+    }
+
+    .grid-container-15x3 {
+        grid-template-columns: repeat(15, 20px);
+        grid-template-rows: repeat(3, 20px);
+    }
+
+    .piece-slot {
+        font-size: 9px;
+    }
+}
+
+@media (min-width: 768px) {
+    .grid-container-15x6 {
+        grid-template-columns: repeat(15, 50px);
+        grid-template-rows: repeat(6, 50px);
+    }
+
+    .grid-container-15x3 {
+        grid-template-columns: repeat(15, 50px);
+        grid-template-rows: repeat(3, 50px);
+    }
+
+    .piece-slot {
+        font-size: 22px;
+    }
+}
+
+/* Modify the container to fit within mobile screens without scrolling */
+.container {
+    max-width: 90vw;
+    margin: 0 auto;
+    padding: 10px;
+    background-color: #fdfaf3;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+    border: 3px solid #2b0505;
+}
+
+#message {
+    font-size: 18px;
+    colour: #ffffff;
+    margin-bottom: 10px;
+}
+#container {
+    width: 100%;
+    height: 20%; /* Adjust height for the dice */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    margin-bottom: 60px; /* Margin to ensure space for the footer */
+}
+footer {
+    width: 100%;
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+}
+
+#playButton {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #f0ad4e;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    margin-bottom: 20px; /* Space between dice and button */
+}
