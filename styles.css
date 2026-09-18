@@ -66,6 +66,8 @@ body {
     border: 6px solid white; /* Thick white border for red home base */
     border-radius: 14px;
     box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.15);
+    transition: border-color 0.2s ease, opacity 0.2s ease;
+    opacity: 0.6;
 }
 
 .home-base-yellow {
@@ -73,6 +75,8 @@ body {
     border: 6px solid white; /* Thick white border for yellow home base */
     border-radius: 14px;
     box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.15);
+    transition: border-color 0.2s ease, opacity 0.2s ease;
+    opacity: 0.6;
 }
 
 .home-base-green {
@@ -80,6 +84,8 @@ body {
     border: 6px solid white; /* Thick white border for green home base */
     border-radius: 14px;
     box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.15);
+    transition: border-color 0.2s ease, opacity 0.2s ease;
+    opacity: 0.6;
 }
 
 .home-base-blue {
@@ -87,21 +93,35 @@ body {
     border: 6px solid white; /* Thick white border for blue home base */
     border-radius: 14px;
     box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.15);
-}
-
-/* Whichever player's turn it is: their home base gets a plain, static
-   ring and the other three are dimmed slightly. No animation/glow —
-   just a calm, always-on visual difference instead of the old
-   "X's turn" text message. */
-.player-base {
-    transition: opacity 0.2s ease, box-shadow 0.2s ease;
+    transition: border-color 0.2s ease, opacity 0.2s ease;
     opacity: 0.6;
 }
 
-.player-base.active-turn {
+/* Whichever player's turn it is: their home base just gets a thin black
+   border (the existing 6px white border is recolored, nothing added on
+   top, so the base's overall size never changes) and full opacity; the
+   other three stay dimmed. No text label anywhere announces the turn. */
+.home-base-red.active-turn,
+.home-base-yellow.active-turn,
+.home-base-green.active-turn,
+.home-base-blue.active-turn {
     opacity: 1;
-    outline: 4px solid #333333;
-    outline-offset: -4px;
+    border: 2px solid #000000;
+}
+
+/* The #message element is hidden by default (turn indication is
+   border-only) but is reused, unhidden, to announce the winner at the
+   end of the game via the .game-over-message class below. */
+#message {
+    display: none;
+}
+
+.game-over-message {
+    display: block !important;
+    color: #ffffff;
+    font-weight: bold;
+    font-size: 20px;
+    text-align: center;
 }
 
 /* Central squares */
@@ -200,8 +220,19 @@ body {
     z-index: auto;
 }
 
+/* The active player's pawns are lifted above every other pawn wherever
+   two colors share a cell (star/safe squares, or a captured stack that
+   hasn't cleared yet), so the pawn you're actually allowed to move this
+   turn is never hidden underneath an opponent's pawn. */
+.piece-slot.current-turn-pawn {
+    z-index: 5;
+}
+
+/* Whatever is currently selectable always wins the stack, even over
+   another current-turn pawn, so the exact clickable target is on top. */
 .piece-slot.movable {
     cursor: pointer;
+    z-index: 6;
 }
 
 /* 15x6 grid styles */
@@ -275,11 +306,6 @@ body {
     border: 3px solid #2b0505;
 }
 
-#message {
-    font-size: 18px;
-    colour: #ffffff;
-    margin-bottom: 10px;
-}
 #container {
     width: 100%;
     height: 20%; /* Adjust height for the dice */
@@ -309,6 +335,11 @@ footer {
     border-radius: 5px;
     color: white;
     margin-bottom: 20px; /* Space between dice and button */
+}
+
+#playButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 /* Belt-and-suspenders: even if a browser tries to re-tint page colors
