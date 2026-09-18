@@ -1,3 +1,16 @@
+
+html {
+    color-scheme: light; /* Force light UA rendering at the root too */
+}
+
+/* Stop any OS/browser forced-color override (e.g. Windows High Contrast
+   "forced-colors" mode) from replacing our own colors on every element,
+   on top of the color-scheme: light declarations above/in the HTML meta
+   tag, which stop the ordinary light/dark auto-tinting. */
+* {
+    forced-color-adjust: none;
+}
+
 body {
     background-color: #501111; /* Background color */
     color-scheme: light; /* Light color scheme */
@@ -39,6 +52,14 @@ body {
     height: 65%;
 }
 
+/* Neutral (non-path) board cells. Using a dedicated class instead of an
+   inline style means we can pin the color with !important and reassert it
+   under prefers-color-scheme: dark, so these cells always render pure
+   white no matter what theme the browser/OS is in. */
+.cell-white {
+    background-color: #ffffff !important;
+}
+
 /* Ludo colors */
 .home-base-red {
     background-color: red;
@@ -68,9 +89,24 @@ body {
     box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.15);
 }
 
+/* Whichever player's turn it is: their home base gets a plain, static
+   ring and the other three are dimmed slightly. No animation/glow —
+   just a calm, always-on visual difference instead of the old
+   "X's turn" text message. */
+.player-base {
+    transition: opacity 0.2s ease, box-shadow 0.2s ease;
+    opacity: 0.6;
+}
+
+.player-base.active-turn {
+    opacity: 1;
+    outline: 4px solid #333333;
+    outline-offset: -4px;
+}
+
 /* Central squares */
 .center-grid {
-    background-color: white;
+    background-color: white !important;
 }
 
 .large-grid-center-3x3 {
@@ -273,4 +309,15 @@ footer {
     border-radius: 5px;
     color: white;
     margin-bottom: 20px; /* Space between dice and button */
+}
+
+/* Belt-and-suspenders: even if a browser tries to re-tint page colors
+   under a system dark theme, force these board surfaces to stay put. */
+@media (prefers-color-scheme: dark) {
+    .cell-white,
+    .center-grid,
+    .home-base-inner,
+    .large-grid-center-3x3.center-grid {
+        background-color: #ffffff !important;
+    }
 }
