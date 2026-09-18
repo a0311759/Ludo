@@ -125,6 +125,8 @@ var PLAYER_BASE_ID = {
     green: 'home-base-green'
 };
 
+// Turn indication is border-only now (see .active-turn in the CSS) —
+// no text label anywhere on the board announces whose turn it is.
 function highlightCurrentPlayer() {
     Object.keys(PLAYER_BASE_ID).forEach(function(color) {
         var el = document.getElementById(PLAYER_BASE_ID[color]);
@@ -134,11 +136,6 @@ function highlightCurrentPlayer() {
     var activeBaseId = PLAYER_BASE_ID[currentPlayer];
     var activeEl = activeBaseId && document.getElementById(activeBaseId);
     if (activeEl) activeEl.classList.add('active-turn');
-
-    var message = document.getElementById('message');
-    if (message) {
-        message.innerText = currentPlayer.charAt(0).toUpperCase() + currentPlayer.slice(1) + "'s turn";
-    }
 }
 
 // Turn resolution after pawn movement
