@@ -1,3 +1,4 @@
+
 // Initialize the stage
 var stage = new Konva.Stage({
     container: 'container',
@@ -13,12 +14,12 @@ stage.add(layer);
 var square = new Konva.Rect({
     x: stage.width() / 2 - 30,
     y: stage.height() / 2 - 30,
-    width: 60,  // Increased size by 20%
-    height: 60, // Increased size by 20%
+    width: 60,
+    height: 60,
     fill: 'white',
     stroke: 'black',
     strokeWidth: 4,
-    cornerRadius: 10, // Rounded corners
+    cornerRadius: 10,
     offsetX: 30,
     offsetY: 30
 });
@@ -31,9 +32,9 @@ var diceText = new Konva.Text({
     x: stage.width() / 2 - 30,
     y: stage.height() / 2 - 30,
     text: '',
-    fontSize: 22,  // Increased font size for bold effect
+    fontSize: 22,
     fontFamily: 'Arial',
-    fontStyle: 'bold', // Bolder dots
+    fontStyle: 'bold',
     fill: 'black',
     width: 60,
     align: 'center',
@@ -112,72 +113,94 @@ function initStarCells() {
     });
 }
 
-var currentPlayer = 'yellow';
+// Set Blue as the first turn
+var currentPlayer = 'blue';
 var consecutiveSixes = 0;
 var rollingAllowed = true;
 
-function updateMessage() {
-    document.getElementById('message').innerText = `${currentPlayer.charAt(0).toUpperCase() + currentPlayer.slice(1)}'s turn`;
+var PLAYER_BASE_ID = {
+    yellow: 'home-base-yellow',
+    blue: 'home-base-blue',
+    red: 'home-base-red',
+    green: 'home-base-green'
+};
+
+function highlightCurrentPlayer() {
+    Object.keys(PLAYER_BASE_ID).forEach(function(color) {
+        var el = document.getElementById(PLAYER_BASE_ID[color]);
+        if (el) el.classList.remove('active-turn');
+    });
+
+    var activeBaseId = PLAYER_BASE_ID[currentPlayer];
+    var activeEl = activeBaseId && document.getElementById(activeBaseId);
+    if (activeEl) activeEl.classList.add('active-turn');
+
+    var message = document.getElementById('message');
+    if (message) {
+        message.innerText = currentPlayer.charAt(0).toUpperCase() + currentPlayer.slice(1) + "'s turn";
+    }
 }
+
+// Turn resolution after pawn movement
+function resolveTurnAfterMove(diceNumber, movedPawn) {
+    var button = document.getElementById('playButton');
+
+    if (diceNumber === 6 && movedPawn) {
+        consecutiveSixes++;
+        if (consecutiveSixes === 3) {
+            // Three consecutive sixes forfeits turn
+            consecutiveSixes = 0;
+            currentPlayer = (currentPlayer === 'blue') ? 'yellow' : 'blue';
+            highlightCurrentPlayer();
+        }
+        // If not 3 consecutive sixes, player keeps turn (bonus roll)
+    } else {
+        consecutiveSixes = 0;
+        currentPlayer = (currentPlayer === 'blue') ? 'yellow' : 'blue';
+        highlightCurrentPlayer();
+    }
+
+    rollingAllowed = true;
+    if (button) button.disabled = false;
+}
+
 function rollDice() {
     if (!rollingAllowed) return;
 
     var button = document.getElementById('playButton');
-    button.disabled = true; // Disable the button
+    button.disabled = true;
+    rollingAllowed = false;
 
-    // Random dice number and rotation speed
     var diceNumber = getRandomDiceNumber();
     var diceFaceText = getDiceFaceText(diceNumber);
     diceText.text(diceFaceText);
 
     var rpm = Math.random() * (5 - 2) + 2;
-    var rotationSpeed = (rpm * 360) / 2; // Degrees per second
+    var rotationSpeed = (rpm * 360) / 2;
 
-    // Animation duration in seconds
     var duration = 2;
     var framesPerSecond = 60;
     var totalFrames = duration * framesPerSecond;
 
     var animation = new Konva.Animation(function(frame) {
-        var elapsedTime = frame.timeDiff / 1000; // Time elapsed in seconds
-        var rotation = rotationSpeed * elapsedTime; // Calculate rotation
+        var elapsedTime = frame.timeDiff / 1000;
+        var rotation = rotationSpeed * elapsedTime;
         square.rotate(rotation);
-        diceText.rotate(rotation); // Rotate the text along with the square
+        diceText.rotate(rotation);
         layer.batchDraw();
     }, layer);
 
-    // Start animation
     animation.start();
 
-    // Stop animation after 2 seconds
     setTimeout(function() {
         animation.stop();
-        button.disabled = false; // Enable the button
-
-        if (diceNumber === 6) {
-            consecutiveSixes++;
-            if (consecutiveSixes === 3) {
-                consecutiveSixes = 0; // Reset consecutive sixes
-                currentPlayer = currentPlayer === 'yellow' ? 'blue' : 'yellow'; // Switch player
-                updateMessage();
-            }
-            rollingAllowed = true; // Allow another roll
-        } else {
-            consecutiveSixes = 0; // Reset consecutive sixes
-            currentPlayer = currentPlayer === 'yellow' ? 'blue' : 'yellow'; // Switch player
-            updateMessage();
-            rollingAllowed = true; // Allow another roll
-        }
-        
-        // Call the function to move the piece from home base
-        movePieceFromHomeBase(diceNumber);
+        movePieceFromHomeBase(diceNumber, function(movedPawn) {
+            resolveTurnAfterMove(diceNumber, movedPawn);
+        });
     }, duration * 1000);
 }
 
-
-
-// Button click event listener
 document.getElementById('playButton').addEventListener('click', rollDice);
 
-updateMessage(); // Initial message
-initStarCells(); // Paint all star markers onto their canvases
+highlightCurrentPlayer();
+initStarCells();
