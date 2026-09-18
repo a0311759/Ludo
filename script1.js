@@ -1,3 +1,4 @@
+
 // Use the following to include this JavaScript file 
 // <script src="script1.js"></script>
 
@@ -199,4 +200,38 @@ function movePieceFromHomeBase(diceNumber, onMoveComplete) {
     });
 
     if (selectableCandidates.length === 0) {
-        done(fal
+        done(false);
+        return;
+    }
+
+    if (selectableCandidates.length === 1) {
+        var choice = selectableCandidates[0];
+        if (choice.type === 'deploy') {
+            deployPawnFromHome(choice.el, color);
+        } else {
+            advancePawn(choice.el, diceNumber);
+        }
+        done(true);
+        return;
+    }
+
+    function onPawnSelected(e) {
+        var clickedEl = e.currentTarget;
+        var chosen = selectableCandidates.find(function(item) { return item.el === clickedEl; });
+
+        cleanupMovableListeners(selectableCandidates, onPawnSelected);
+
+        if (chosen.type === 'deploy') {
+            deployPawnFromHome(chosen.el, color);
+        } else {
+            advancePawn(chosen.el, diceNumber);
+        }
+
+        done(true);
+    }
+
+    selectableCandidates.forEach(function(item) {
+        item.el.classList.add('movable');
+        item.el.addEventListener('click', onPawnSelected);
+    });
+}
